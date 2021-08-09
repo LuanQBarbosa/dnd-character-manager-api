@@ -3,14 +3,25 @@ package br.inatel.charactermanager.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Group {
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+@Entity
+public class Game {
 	
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String name;
+	@ManyToOne
 	private User gameMaster;
+	@ManyToMany
 	private List<User> players = new ArrayList<>();
-	private List<User> requests = new ArrayList<>();
-	
+	@OneToMany(mappedBy = "game")
 	private List<Character> characters = new ArrayList<>();
 	
 	@Override
@@ -29,7 +40,7 @@ public class Group {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Group other = (Group) obj;
+		Game other = (Game) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -76,14 +87,6 @@ public class Group {
 
 	public void setCharacters(List<Character> characters) {
 		this.characters = characters;
-	}
-
-	public List<User> getRequests() {
-		return requests;
-	}
-
-	public void setRequests(List<User> requests) {
-		this.requests = requests;
 	}
 
 }

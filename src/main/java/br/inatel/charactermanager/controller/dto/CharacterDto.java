@@ -10,6 +10,9 @@ public class CharacterDto {
 	
 	private Long id;
 	private String ownerName;
+	private Long ownerId;
+	private String gameName;
+	private Long gameId;
 	
 	private String name;
 	private String race;
@@ -32,7 +35,10 @@ public class CharacterDto {
 	
 	public CharacterDto(Character character) {
 		this.id = character.getId();
+		this.ownerId = character.getOwner().getId();
 		this.ownerName = character.getOwner().getName();
+		this.gameId = character.getGame().getId();
+		this.gameName = character.getGame().getName();
 		this.name = character.getName();
 		this.race = character.getRace().name();
 		this.job = character.getJob().name();
@@ -96,6 +102,17 @@ public class CharacterDto {
 	}
 	public List<ItemDto> getItems() {
 		return items;
+	}
+	public Long getGameId() {
+		return gameId;
+	}
+
+	public Long getOwnerId() {
+		return ownerId;
+	}
+
+	public String getGameName() {
+		return gameName;
 	}
 
 }

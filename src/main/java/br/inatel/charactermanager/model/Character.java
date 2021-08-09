@@ -3,13 +3,29 @@ package br.inatel.charactermanager.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+
+@Entity
 public class Character {
 
+	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@ManyToOne
 	private User owner;
+	@ManyToOne
+	private Game game;
 	
 	private String name;
+	@Enumerated(EnumType.STRING)
 	private Race race;
+	@Enumerated(EnumType.STRING)
 	private Job job;
 	private int level;
 	private int hp = 100;
@@ -21,8 +37,11 @@ public class Character {
 	private int constitution;
 	private int charisma;
 	
+	@ManyToMany
 	private List<Weapon> weapons = new ArrayList<>();
+	@ManyToMany
 	private List<Armor> armors = new ArrayList<>();
+	@ManyToMany
 	private List<Item> items = new ArrayList<>();
 	
 	@Override
@@ -176,6 +195,14 @@ public class Character {
 
 	public void setArmors(List<Armor> armors) {
 		this.armors = armors;
+	}
+
+	public Game getGame() {
+		return game;
+	}
+
+	public void setGroup(Game game) {
+		this.game = game;
 	}
 	
 }
