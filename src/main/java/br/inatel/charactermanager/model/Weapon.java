@@ -1,9 +1,12 @@
 package br.inatel.charactermanager.model;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 
 @Entity
 public class Weapon {
@@ -17,6 +20,9 @@ public class Weapon {
 	private String damageType;
 	private int cost;
 	private int weight;
+	
+	@ManyToMany(mappedBy = "weapons")
+	private List<Character> owners;
 	
 	@Override
 	public int hashCode() {
@@ -105,6 +111,14 @@ public class Weapon {
 	
 	public void setWeight(int weight) {
 		this.weight = weight;
+	}
+
+	public List<Character> getOwners() {
+		return owners;
+	}
+
+	public void setOwners(List<Character> owners) {
+		this.owners = owners;
 	}
 
 }

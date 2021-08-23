@@ -23,12 +23,13 @@ public class Character {
 	private Game game;
 	
 	private String name;
+	private int level;
+	private int hp = 100;
+	
 	@Enumerated(EnumType.STRING)
 	private Race race;
 	@Enumerated(EnumType.STRING)
 	private Job job;
-	private int level;
-	private int hp = 100;
 	
 	private int strength;
 	private int intelligence;

@@ -1,9 +1,13 @@
 package br.inatel.charactermanager.model;
 
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 @Entity
 public class User {
@@ -13,6 +17,13 @@ public class User {
 	private String name;
 	private String email;
 	private String password;
+	
+	@ManyToMany(mappedBy = "players")
+	private List<Game> playingGames;
+	@OneToMany(mappedBy = "gameMaster")
+	private List<Game> ownedGames;
+	@OneToMany(mappedBy = "owner")
+	private List<Character> characters;
 
 	@Override
 	public int hashCode() {
@@ -69,6 +80,30 @@ public class User {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public List<Game> getOwnedGames() {
+		return ownedGames;
+	}
+
+	public void setOwnedGames(List<Game> ownedGames) {
+		this.ownedGames = ownedGames;
+	}
+
+	public List<Character> getCharacters() {
+		return characters;
+	}
+
+	public void setCharacters(List<Character> characters) {
+		this.characters = characters;
+	}
+
+	public List<Game> getPlayingGames() {
+		return playingGames;
+	}
+
+	public void setPlayingGames(List<Game> playingGames) {
+		this.playingGames = playingGames;
 	}
 
 }
