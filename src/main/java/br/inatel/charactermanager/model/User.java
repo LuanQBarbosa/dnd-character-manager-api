@@ -1,7 +1,9 @@
 package br.inatel.charactermanager.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -19,11 +21,11 @@ public class User {
 	private String password;
 	
 	@ManyToMany(mappedBy = "players")
-	private List<Game> playingGames;
-	@OneToMany(mappedBy = "gameMaster")
-	private List<Game> ownedGames;
-	@OneToMany(mappedBy = "owner")
-	private List<Character> characters;
+	private List<Game> playingGames = new ArrayList<>();
+	@OneToMany(mappedBy = "gameMaster", cascade = CascadeType.ALL)
+	private List<Game> ownedGames = new ArrayList<>();
+	@OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+	private List<Character> characters = new ArrayList<>();
 
 	@Override
 	public int hashCode() {

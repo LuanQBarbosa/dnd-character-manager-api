@@ -16,14 +16,9 @@ import javax.persistence.ManyToOne;
 public class Character {
 
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	@ManyToOne
-	private User owner;
-	@ManyToOne
-	private Game game;
-	
+	private Long id;	
 	private String name;
-	private int level;
+	private int level = 1;
 	private int hp = 100;
 	
 	@Enumerated(EnumType.STRING)
@@ -37,6 +32,11 @@ public class Character {
 	private int dexterity;
 	private int constitution;
 	private int charisma;
+	
+	@ManyToOne
+	private User owner;
+	@ManyToOne
+	private Game game;
 	
 	@ManyToMany
 	private List<Weapon> weapons = new ArrayList<>();
@@ -202,7 +202,7 @@ public class Character {
 		return game;
 	}
 
-	public void setGroup(Game game) {
+	public void setGame(Game game) {
 		this.game = game;
 	}
 	

@@ -114,5 +114,9 @@ public class CharacterDto {
 	public String getGameName() {
 		return gameName;
 	}
+	
+	public static List<CharacterDto> convertList(List<Character> characters) {
+		return characters.stream().map(CharacterDto::new).collect(Collectors.toList());
+	}
 
 }

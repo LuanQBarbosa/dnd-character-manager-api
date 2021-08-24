@@ -3,6 +3,7 @@ package br.inatel.charactermanager.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,7 +23,7 @@ public class Game {
 	private User gameMaster;
 	@ManyToMany
 	private List<User> players = new ArrayList<>();
-	@OneToMany(mappedBy = "game")
+	@OneToMany(mappedBy = "game", cascade = CascadeType.ALL)
 	private List<Character> characters = new ArrayList<>();
 	
 	@Override

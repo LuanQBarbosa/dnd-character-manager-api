@@ -9,16 +9,14 @@ public class GameDto {
 	
 	private Long id;
 	private String name;
-	private String gameMaster;
-	private List<String> players;
-	private List<CharacterDto> characters;
+	private Long gameMasterId;
+	private List<Long> playersIdList;
 	
 	public GameDto(Game game) {
 		this.id = game.getId();
 		this.name = game.getName();
-		this.gameMaster = game.getGameMaster().getName();
-		this.players = game.getPlayers().stream().map(x -> x.getName()).collect(Collectors.toList());
-		this.characters = game.getCharacters().stream().map(CharacterDto::new).collect(Collectors.toList());
+		this.gameMasterId = game.getGameMaster().getId();
+		this.playersIdList = game.getPlayers().stream().map(x -> x.getId()).collect(Collectors.toList());
 	}
 
 	public Long getId() {
@@ -29,19 +27,15 @@ public class GameDto {
 		return name;
 	}
 
-	public String getGameMaster() {
-		return gameMaster;
+	public Long getGameMasterId() {
+		return gameMasterId;
 	}
 
-	public List<String> getPlayers() {
-		return players;
-	}
-
-	public List<CharacterDto> getCharacters() {
-		return characters;
+	public List<Long> getPlayersIdList() {
+		return playersIdList;
 	}
 	
-	public List<GameDto> convert(List<Game> games) {
+	public static List<GameDto> convertList(List<Game> games) {
 		return games.stream().map(GameDto::new).collect(Collectors.toList());
 	}
 
