@@ -21,8 +21,8 @@ public class Weapon {
 	private int cost;
 	private int weight;
 	
-	@ManyToMany(mappedBy = "weapons")
-	private List<Character> owners;
+//	@ManyToMany(mappedBy = "weapons")
+//	private List<Character> owners;
 	
 	@Override
 	public int hashCode() {
@@ -113,12 +113,12 @@ public class Weapon {
 		this.weight = weight;
 	}
 
-	public List<Character> getOwners() {
-		return owners;
-	}
-
-	public void setOwners(List<Character> owners) {
-		this.owners = owners;
-	}
+//	public List<Character> getOwners() {
+//		return owners;
+//	}
+//
+//	public void setOwners(List<Character> owners) {
+//		this.owners = owners;
+//	}
 
 }

@@ -3,13 +3,13 @@ package br.inatel.charactermanager.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -37,13 +37,13 @@ public class Character {
 	private User owner;
 	@ManyToOne
 	private Game game;
-	
-	@ManyToMany
-	private List<Weapon> weapons = new ArrayList<>();
-	@ManyToMany
-	private List<Armor> armors = new ArrayList<>();
-	@ManyToMany
-	private List<Item> items = new ArrayList<>();
+
+	@ElementCollection
+	private List<String> weaponsIndex = new ArrayList<>();
+	@ElementCollection
+	private List<String> armorsIndex = new ArrayList<>();
+	@ElementCollection
+	private List<String> itemsIndex = new ArrayList<>();
 	
 	@Override
 	public int hashCode() {
@@ -166,14 +166,6 @@ public class Character {
 		this.charisma = charisma;
 	}
 
-	public List<Item> getItems() {
-		return items;
-	}
-
-	public void setItems(List<Item> items) {
-		this.items = items;
-	}
-
 	public User getOwner() {
 		return owner;
 	}
@@ -182,28 +174,36 @@ public class Character {
 		this.owner = owner;
 	}
 
-	public List<Weapon> getWeapons() {
-		return weapons;
-	}
-
-	public void setWeapons(List<Weapon> weapons) {
-		this.weapons = weapons;
-	}
-
-	public List<Armor> getArmors() {
-		return armors;
-	}
-
-	public void setArmors(List<Armor> armors) {
-		this.armors = armors;
-	}
-
 	public Game getGame() {
 		return game;
 	}
 
 	public void setGame(Game game) {
 		this.game = game;
+	}
+	
+	public List<String> getWeaponsIndex() {
+		return weaponsIndex;
+	}
+
+	public void setWeaponsIndex(List<String> weaponsIndex) {
+		this.weaponsIndex = weaponsIndex;
+	}
+
+	public List<String> getArmorsIndex() {
+		return armorsIndex;
+	}
+
+	public void setArmorsIndex(List<String> armorsIndex) {
+		this.armorsIndex = armorsIndex;
+	}
+
+	public List<String> getItemsIndex() {
+		return itemsIndex;
+	}
+
+	public void setItemsIndex(List<String> itemsIndex) {
+		this.itemsIndex = itemsIndex;
 	}
 	
 }

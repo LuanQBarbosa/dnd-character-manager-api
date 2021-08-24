@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import br.inatel.charactermanager.model.Character;
+import br.inatel.charactermanager.service.EquipmentService;
+import br.inatel.charactermanager.service.models.Armor;
+import br.inatel.charactermanager.service.models.Item;
+import br.inatel.charactermanager.service.models.Weapon;
 
 public class CharacterDto {
 	
@@ -27,13 +31,11 @@ public class CharacterDto {
 	private int constitution;
 	private int charisma;
 	
-	private List<WeaponDto> weapons = new ArrayList<>();
-	private List<ArmorDto> armors = new ArrayList<>();
-	private List<ItemDto> items = new ArrayList<>();
+	private List<Weapon> weapons = new ArrayList<>();
+	private List<Armor> armors = new ArrayList<>();
+	private List<Item> items = new ArrayList<>();
 	
-	
-	
-	public CharacterDto(Character character) {
+	public CharacterDto(Character character, EquipmentService equipmentService) {
 		this.id = character.getId();
 		this.ownerId = character.getOwner().getId();
 		this.ownerName = character.getOwner().getName();
@@ -50,9 +52,10 @@ public class CharacterDto {
 		this.dexterity = character.getDexterity();
 		this.constitution = character.getConstitution();
 		this.charisma = character.getCharisma();
-		this.weapons = character.getWeapons().stream().map(WeaponDto::new).collect(Collectors.toList());
-		this.armors = character.getArmors().stream().map(ArmorDto::new).collect(Collectors.toList());;
-		this.items = character.getItems().stream().map(ItemDto::new).collect(Collectors.toList());;
+		
+		this.weapons = character.getWeaponsIndex().stream().map(x -> equipmentService.getWeapon(x)).collect(Collectors.toList());
+		this.armors = character.getArmorsIndex().stream().map(x -> equipmentService.getArmor(x)).collect(Collectors.toList());;
+		this.items = character.getItemsIndex().stream().map(x -> equipmentService.getItem(x)).collect(Collectors.toList());;
 	}
 	
 	public Long getId() {
@@ -94,13 +97,13 @@ public class CharacterDto {
 	public int getCharisma() {
 		return charisma;
 	}
-	public List<WeaponDto> getWeapons() {
+	public List<Weapon> getWeapons() {
 		return weapons;
 	}
-	public List<ArmorDto> getArmors() {
+	public List<Armor> getArmors() {
 		return armors;
 	}
-	public List<ItemDto> getItems() {
+	public List<Item> getItems() {
 		return items;
 	}
 	public Long getGameId() {
@@ -115,8 +118,8 @@ public class CharacterDto {
 		return gameName;
 	}
 	
-	public static List<CharacterDto> convertList(List<Character> characters) {
-		return characters.stream().map(CharacterDto::new).collect(Collectors.toList());
+	public static List<CharacterDto> convertList(List<Character> characters, EquipmentService equipmentService) {
+		return characters.stream().map(x -> new CharacterDto(x, equipmentService)).collect(Collectors.toList());
 	}
 
 }

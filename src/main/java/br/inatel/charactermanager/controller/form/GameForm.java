@@ -3,6 +3,10 @@ package br.inatel.charactermanager.controller.form;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import br.inatel.charactermanager.controller.repository.UserRepository;
+import br.inatel.charactermanager.model.Game;
+import br.inatel.charactermanager.model.User;
+
 public class GameForm {
 	
 	@NotNull
@@ -25,6 +29,16 @@ public class GameForm {
 	
 	public void setGameMasterId(Long gameMasterId) {
 		this.gameMasterId = gameMasterId;
+	}
+	
+	public Game convert(UserRepository userRepository) {
+		User gameMaster = userRepository.findById(gameMasterId).get();
+		
+		Game newGame = new Game();
+		newGame.setGameMaster(gameMaster);
+		newGame.setName(name);
+		
+		return newGame;
 	}
 	
 }

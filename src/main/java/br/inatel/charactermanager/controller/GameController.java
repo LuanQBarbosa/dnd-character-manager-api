@@ -67,12 +67,7 @@ public class GameController {
 	@PostMapping
 	@Transactional
 	public ResponseEntity<?> create(@RequestBody @Valid GameForm form, UriComponentsBuilder uriBuilder) {
-		User gameMaster = userRepository.findById(form.getGameMasterId()).get();
-		
-		Game newGame = new Game();
-		newGame.setGameMaster(gameMaster);
-		newGame.setName(form.getName());
-		
+		Game newGame = form.convert(userRepository);		
 		Game game = gameRepository.save(newGame);
 		
 		URI uri = uriBuilder.path("/game/{id}").buildAndExpand(game.getId()).toUri();
