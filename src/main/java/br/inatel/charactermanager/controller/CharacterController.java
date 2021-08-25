@@ -92,20 +92,20 @@ public class CharacterController {
 		return ResponseEntity.created(uri).body(new CharacterDto(character, equipmentService));
 	}
 	
-//	@PutMapping("/{characterId}")
-//	@Transactional
-//	public ResponseEntity<?> update(@PathVariable Long characterId, @RequestBody @Valid UpdateCharacterForm form, UriComponentsBuilder uriBuilder) {
-//		Game game = form.update(gameId, gameRepository, userRepository, characterRepository);
-//		
-//		return ResponseEntity.ok(new GameDto(game));
-//	}
+	@PutMapping("/{characterId}")
+	@Transactional
+	public ResponseEntity<?> update(@PathVariable Long characterId, @RequestBody @Valid UpdateCharacterForm form) {
+		Character character = form.update(characterId, characterRepository);
+		
+		return ResponseEntity.ok(new CharacterDto(character, equipmentService));
+	}
 	
-//	@DeleteMapping("/{gameId}")
-//	@Transactional
-//	public ResponseEntity<?> delete(@PathVariable Long gameId) {
-//		gameRepository.deleteById(gameId);
-//		
-//		return ResponseEntity.ok().build();
-//	}
+	@DeleteMapping("/{characterId}")
+	@Transactional
+	public ResponseEntity<?> delete(@PathVariable Long characterId) {
+		characterRepository.deleteById(characterId);
+		
+		return ResponseEntity.ok().build();
+	}
 	
 }

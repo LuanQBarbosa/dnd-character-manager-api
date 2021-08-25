@@ -76,7 +76,7 @@ public class GameController {
 	
 	@PutMapping("/{gameId}")
 	@Transactional
-	public ResponseEntity<?> update(@PathVariable Long gameId, @RequestBody @Valid UpdateGameForm form, UriComponentsBuilder uriBuilder) {
+	public ResponseEntity<?> update(@PathVariable Long gameId, @RequestBody @Valid UpdateGameForm form) {
 		Game game = form.update(gameId, gameRepository, userRepository, characterRepository);
 		
 		return ResponseEntity.ok(new GameDto(game));

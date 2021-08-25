@@ -3,24 +3,38 @@ package br.inatel.charactermanager.controller.form;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import br.inatel.charactermanager.controller.repository.GameRepository;
-import br.inatel.charactermanager.controller.repository.UserRepository;
+import br.inatel.charactermanager.controller.repository.CharacterRepository;
 import br.inatel.charactermanager.model.Character;
-import br.inatel.charactermanager.model.Game;
 import br.inatel.charactermanager.model.Job;
 import br.inatel.charactermanager.model.Race;
-import br.inatel.charactermanager.model.User;
 
 public class UpdateCharacterForm {
 	
+	@NotNull
+	@NotEmpty
 	private String name;
+	@NotNull
+	private int level;
+	@NotNull
+	private int hp;
+	@NotNull
+	@NotEmpty
+	private String race;
+	@NotNull
+	@NotEmpty
 	private String job;
-	
+
+	@NotNull
 	private int strength;
+	@NotNull
 	private int intelligence;
+	@NotNull
 	private int wisdom;
+	@NotNull
 	private int dexterity;
+	@NotNull
 	private int constitution;
+	@NotNull
 	private int charisma;
 	
 	public String getName() {
@@ -87,25 +101,46 @@ public class UpdateCharacterForm {
 		this.charisma = charisma;
 	}
 	
-//	public Character convert(UserRepository userRepository, GameRepository gameRepository) {
-//		User owner = userRepository.findById(ownerId).get();
-//		Game game = gameRepository.findById(gameId).get();
-//		
-//		Character newCharacter = new Character();
-//		newCharacter.setName(name);
-//		newCharacter.setRace(Race.valueOf(race.toUpperCase()));
-//		newCharacter.setJob(Job.valueOf(job.toUpperCase()));
-//		
-//		newCharacter.setStrength(strength);
-//		newCharacter.setCharisma(charisma);
-//		newCharacter.setConstitution(constitution);
-//		newCharacter.setIntelligence(intelligence);
-//		newCharacter.setWisdom(wisdom);
-//		newCharacter.setDexterity(dexterity);
-//		
-//		newCharacter.setOwner(owner);
-//		newCharacter.setGame(game);
-//		
-//		return newCharacter;
-//	}
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
+	public int getHp() {
+		return hp;
+	}
+
+	public void setHp(int hp) {
+		this.hp = hp;
+	}
+
+	public String getRace() {
+		return race;
+	}
+
+	public void setRace(String race) {
+		this.race = race;
+	}
+	
+	public Character update(Long characterId, CharacterRepository characterRepository) {
+		Character character = characterRepository.findById(characterId).get();
+		
+		character.setName(name);
+		character.setLevel(level);
+		character.setHp(hp);
+		character.setRace(Race.valueOf(race.toUpperCase()));
+		character.setJob(Job.valueOf(job.toUpperCase()));
+		
+		character.setCharisma(charisma);
+		character.setDexterity(dexterity);
+		character.setIntelligence(intelligence);
+		character.setStrength(strength);
+		character.setWisdom(wisdom);
+		character.setConstitution(constitution);
+		
+		return character;
+	}
 }
