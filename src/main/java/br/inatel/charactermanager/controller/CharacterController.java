@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -11,6 +12,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import br.inatel.charactermanager.config.validation.ErrorFormDto;
 import br.inatel.charactermanager.controller.dto.CharacterDto;
 import br.inatel.charactermanager.controller.dto.GameDto;
 import br.inatel.charactermanager.controller.form.CharacterForm;
@@ -32,6 +35,7 @@ import br.inatel.charactermanager.controller.form.UpdateGameForm;
 import br.inatel.charactermanager.controller.repository.CharacterRepository;
 import br.inatel.charactermanager.controller.repository.GameRepository;
 import br.inatel.charactermanager.controller.repository.UserRepository;
+import br.inatel.charactermanager.exception.InvalidPropertyException;
 import br.inatel.charactermanager.model.Character;
 import br.inatel.charactermanager.model.Game;
 import br.inatel.charactermanager.model.Job;
@@ -68,24 +72,30 @@ public class CharacterController {
 		return ResponseEntity.ok(CharacterDto.convertList(charactersList, equipmentService));
 	}
 	
-	@GetMapping("/weapons")
-	public ResponseEntity<?> listWeapons() {
-		Item weapon = equipmentService.getItem("abacus");
-		
-		return ResponseEntity.ok(weapon);
-	}
-	
 	@GetMapping("/{characterId}")
 	public ResponseEntity<?> getByCharacterId(@PathVariable Long characterId) {
-		Character character = characterRepository.findById(characterId).get();
+		Optional<Character> character = characterRepository.findById(characterId);
 		
-		return ResponseEntity.ok(new CharacterDto(character, equipmentService));
+		if (!character.isPresent()) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(new ErrorFormDto("", "No character found with the informed id"));
+		}
+		
+		return ResponseEntity.ok(new CharacterDto(character.get(), equipmentService));
 	}
 	
 	@PostMapping
 	@Transactional
 	public ResponseEntity<?> create(@RequestBody @Valid CharacterForm form, UriComponentsBuilder uriBuilder) {
-		Character newCharacter = form.convert(userRepository, gameRepository);
+		Character newCharacter;
+		try {
+			newCharacter = form.convert(userRepository, gameRepository);			
+		} catch(InvalidPropertyException e) {
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(new ErrorFormDto("", e.getMessage()));
+		}
 		
 		Character character = characterRepository.save(newCharacter);
 		
@@ -96,7 +106,14 @@ public class CharacterController {
 	@PutMapping("/{characterId}")
 	@Transactional
 	public ResponseEntity<?> update(@PathVariable Long characterId, @RequestBody @Valid UpdateCharacterForm form) {
-		Character character = form.update(characterId, characterRepository);
+		Character character;
+		try {
+			character = form.update(characterId, characterRepository);			
+		} catch (InvalidPropertyException e) {
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(new ErrorFormDto("", e.getMessage()));
+		}
 		
 		return ResponseEntity.ok(new CharacterDto(character, equipmentService));
 	}
@@ -104,7 +121,14 @@ public class CharacterController {
 	@PutMapping("/{characterId}/equipment")
 	@Transactional
 	public ResponseEntity<?> updateEquipment(@PathVariable Long characterId, @RequestBody @Valid UpdateCharacterEquipmentForm form) {
-		Character character = form.update(characterId, characterRepository);
+		Character character;
+		try {
+			character = form.update(characterId, characterRepository, equipmentService);			
+		} catch (InvalidPropertyException e) {
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(new ErrorFormDto("", e.getMessage()));
+		}
 		
 		return ResponseEntity.ok(new CharacterDto(character, equipmentService));
 	}

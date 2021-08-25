@@ -150,6 +150,9 @@ public class GameController {
 		character1.setIntelligence(5);
 		character1.setWisdom(5);
 		character1.setConstitution(5);
+		character1.getWeaponsIndex().add("shortsword");
+		character1.getArmorsIndex().add("padded");
+		character1.getItemsIndex().add("backpack");
 		character1.setOwner(player1);
 		character1.setGame(game1);
 		

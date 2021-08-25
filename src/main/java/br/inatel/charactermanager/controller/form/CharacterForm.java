@@ -1,10 +1,13 @@
 package br.inatel.charactermanager.controller.form;
 
+import java.util.Optional;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import br.inatel.charactermanager.controller.repository.GameRepository;
 import br.inatel.charactermanager.controller.repository.UserRepository;
+import br.inatel.charactermanager.exception.InvalidPropertyException;
 import br.inatel.charactermanager.model.Game;
 import br.inatel.charactermanager.model.Job;
 import br.inatel.charactermanager.model.Race;
@@ -129,9 +132,17 @@ public class CharacterForm {
 		this.gameId = gameId;
 	}
 	
-	public Character convert(UserRepository userRepository, GameRepository gameRepository) {
-		User owner = userRepository.findById(ownerId).get();
-		Game game = gameRepository.findById(gameId).get();
+	public Character convert(UserRepository userRepository, GameRepository gameRepository) throws InvalidPropertyException {
+		Optional<User> owner = userRepository.findById(ownerId);
+		Optional<Game> game = gameRepository.findById(gameId);
+		
+		if (!game.isPresent()) {
+			throw new InvalidPropertyException("Could not find a Game with specified Id");
+		}
+		
+		if (!owner.isPresent()) {
+			throw new InvalidPropertyException("Could not find a User with specified Id");
+		}
 		
 		Character newCharacter = new Character();
 		newCharacter.setName(name);
@@ -145,8 +156,8 @@ public class CharacterForm {
 		newCharacter.setWisdom(wisdom);
 		newCharacter.setDexterity(dexterity);
 		
-		newCharacter.setOwner(owner);
-		newCharacter.setGame(game);
+		newCharacter.setOwner(owner.get());
+		newCharacter.setGame(game.get());
 		
 		return newCharacter;
 	}

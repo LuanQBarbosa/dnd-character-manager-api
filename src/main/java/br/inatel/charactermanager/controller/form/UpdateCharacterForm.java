@@ -1,9 +1,12 @@
 package br.inatel.charactermanager.controller.form;
 
+import java.util.Optional;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import br.inatel.charactermanager.controller.repository.CharacterRepository;
+import br.inatel.charactermanager.exception.InvalidPropertyException;
 import br.inatel.charactermanager.model.Character;
 import br.inatel.charactermanager.model.Job;
 import br.inatel.charactermanager.model.Race;
@@ -125,8 +128,13 @@ public class UpdateCharacterForm {
 		this.race = race;
 	}
 	
-	public Character update(Long characterId, CharacterRepository characterRepository) {
-		Character character = characterRepository.findById(characterId).get();
+	public Character update(Long characterId, CharacterRepository characterRepository) throws InvalidPropertyException {
+		Optional<Character> optional = characterRepository.findById(characterId);
+		if (!optional.isPresent()) {
+			throw new InvalidPropertyException("Could not find a Character with specified Id");
+		}
+		
+		Character character = optional.get();
 		
 		character.setName(name);
 		character.setLevel(level);
