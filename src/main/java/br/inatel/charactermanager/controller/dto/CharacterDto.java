@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 
 import br.inatel.charactermanager.model.Character;
 import br.inatel.charactermanager.service.EquipmentService;
-import br.inatel.charactermanager.service.models.Armor;
-import br.inatel.charactermanager.service.models.Item;
-import br.inatel.charactermanager.service.models.Weapon;
+import br.inatel.charactermanager.service.dto.Armor;
+import br.inatel.charactermanager.service.dto.Item;
+import br.inatel.charactermanager.service.dto.Weapon;
 
 public class CharacterDto {
 	

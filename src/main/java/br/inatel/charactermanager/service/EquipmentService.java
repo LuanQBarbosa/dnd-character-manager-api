@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import br.inatel.charactermanager.service.models.Armor;
-import br.inatel.charactermanager.service.models.Equipment;
-import br.inatel.charactermanager.service.models.EquipmentCategory;
-import br.inatel.charactermanager.service.models.Item;
-import br.inatel.charactermanager.service.models.Weapon;
+import br.inatel.charactermanager.service.dto.Armor;
+import br.inatel.charactermanager.service.dto.Equipment;
+import br.inatel.charactermanager.service.dto.EquipmentCategory;
+import br.inatel.charactermanager.service.dto.Item;
+import br.inatel.charactermanager.service.dto.Weapon;
 
 @Service
 public class EquipmentService {

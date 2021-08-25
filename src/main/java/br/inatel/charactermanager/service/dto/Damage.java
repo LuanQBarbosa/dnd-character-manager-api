@@ -1,4 +1,4 @@
-package br.inatel.charactermanager.service.models;
+package br.inatel.charactermanager.service.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

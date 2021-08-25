@@ -11,24 +11,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.inatel.charactermanager.config.validation.ErrorFormDto;
-import br.inatel.charactermanager.controller.repository.CharacterRepository;
-import br.inatel.charactermanager.controller.repository.GameRepository;
-import br.inatel.charactermanager.controller.repository.UserRepository;
 import br.inatel.charactermanager.service.EquipmentService;
-import br.inatel.charactermanager.service.models.Armor;
-import br.inatel.charactermanager.service.models.Item;
-import br.inatel.charactermanager.service.models.Weapon;
+import br.inatel.charactermanager.service.dto.Armor;
+import br.inatel.charactermanager.service.dto.Item;
+import br.inatel.charactermanager.service.dto.Weapon;
 
 @RestController
 @RequestMapping("/equipment")
 public class EquipmentController {
 	
-	@Autowired
-	private GameRepository gameRepository;
-	@Autowired
-	private UserRepository userRepository;
-	@Autowired
-	private CharacterRepository characterRepository;
 	@Autowired
 	private EquipmentService equipmentService;
 	

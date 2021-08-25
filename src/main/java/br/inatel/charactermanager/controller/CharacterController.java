@@ -26,6 +26,7 @@ import br.inatel.charactermanager.controller.dto.CharacterDto;
 import br.inatel.charactermanager.controller.dto.GameDto;
 import br.inatel.charactermanager.controller.form.CharacterForm;
 import br.inatel.charactermanager.controller.form.GameForm;
+import br.inatel.charactermanager.controller.form.UpdateCharacterEquipmentForm;
 import br.inatel.charactermanager.controller.form.UpdateCharacterForm;
 import br.inatel.charactermanager.controller.form.UpdateGameForm;
 import br.inatel.charactermanager.controller.repository.CharacterRepository;
@@ -37,10 +38,10 @@ import br.inatel.charactermanager.model.Job;
 import br.inatel.charactermanager.model.Race;
 import br.inatel.charactermanager.model.User;
 import br.inatel.charactermanager.service.EquipmentService;
-import br.inatel.charactermanager.service.models.Armor;
-import br.inatel.charactermanager.service.models.EquipmentCategory;
-import br.inatel.charactermanager.service.models.Item;
-import br.inatel.charactermanager.service.models.Weapon;
+import br.inatel.charactermanager.service.dto.Armor;
+import br.inatel.charactermanager.service.dto.EquipmentCategory;
+import br.inatel.charactermanager.service.dto.Item;
+import br.inatel.charactermanager.service.dto.Weapon;
 
 @RestController
 @RequestMapping("/character")
@@ -95,6 +96,14 @@ public class CharacterController {
 	@PutMapping("/{characterId}")
 	@Transactional
 	public ResponseEntity<?> update(@PathVariable Long characterId, @RequestBody @Valid UpdateCharacterForm form) {
+		Character character = form.update(characterId, characterRepository);
+		
+		return ResponseEntity.ok(new CharacterDto(character, equipmentService));
+	}
+	
+	@PutMapping("/{characterId}/equipment")
+	@Transactional
+	public ResponseEntity<?> updateEquipment(@PathVariable Long characterId, @RequestBody @Valid UpdateCharacterEquipmentForm form) {
 		Character character = form.update(characterId, characterRepository);
 		
 		return ResponseEntity.ok(new CharacterDto(character, equipmentService));
