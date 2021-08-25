@@ -62,7 +62,7 @@ public class GameController {
 	}
 	
 	@GetMapping("/{gameId}")
-	public ResponseEntity<?> getByGameId(@PathVariable("gameId") Long gameId) {
+	public ResponseEntity<?> getByGameId(@PathVariable Long gameId) {
 		Optional<Game> game = gameRepository.findById(gameId);
 		
 		if(!game.isPresent()) {
