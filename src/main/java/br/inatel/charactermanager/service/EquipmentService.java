@@ -3,6 +3,7 @@ package br.inatel.charactermanager.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,6 +19,7 @@ public class EquipmentService {
 	private RestTemplate restTemplate = new RestTemplate();
 	private String baseURL = "https://www.dnd5eapi.co/api";
 	
+	@Cacheable(value = "equipmentList")
 	public List<Equipment> getEquipmentList(String type) {
 		EquipmentCategory equipmentCategory = restTemplate.getForObject(baseURL + "/equipment-categories/" + type, EquipmentCategory.class);
 		
@@ -28,18 +30,21 @@ public class EquipmentService {
 		return equipmentsList;
 	}
 	
+	@Cacheable(value="weaponsList")
 	public List<Equipment> getWeaponsList() {		
 		List<Equipment> weaponsList = getEquipmentList("weapon");
 		
 		return weaponsList;
 	}
 	
+	@Cacheable(value="armorsList")
 	public List<Equipment> getArmorsList() {		
 		List<Equipment> armorsList = getEquipmentList("armor");
 		
 		return armorsList;
 	}
 	
+	@Cacheable(value="itemsList")
 	public List<Equipment> getItemsList() {
 		List<Equipment> itemsList = getEquipmentList("adventuring-gear");
 		

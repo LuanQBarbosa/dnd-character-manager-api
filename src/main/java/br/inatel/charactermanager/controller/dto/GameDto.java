@@ -3,6 +3,8 @@ package br.inatel.charactermanager.controller.dto;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+
 import br.inatel.charactermanager.model.Game;
 
 public class GameDto {
@@ -35,8 +37,8 @@ public class GameDto {
 		return playersIdList;
 	}
 	
-	public static List<GameDto> convertList(List<Game> games) {
-		return games.stream().map(GameDto::new).collect(Collectors.toList());
+	public static Page<GameDto> convertList(Page<Game> games) {
+		return games.map(GameDto::new);
 	}
 
 }

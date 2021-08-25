@@ -11,6 +11,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,6 +63,7 @@ public class CharacterController {
 	private EquipmentService equipmentService;
 	
 	@GetMapping
+	@Cacheable(value="charactersList")
 	public ResponseEntity<?> list(Long gameId, Long playerId) {
 		List<Character> charactersList;
 		if (playerId == null) {
@@ -87,6 +90,7 @@ public class CharacterController {
 	
 	@PostMapping
 	@Transactional
+	@CacheEvict(value = "charactersList", allEntries = true)
 	public ResponseEntity<?> create(@RequestBody @Valid CharacterForm form, UriComponentsBuilder uriBuilder) {
 		Character newCharacter;
 		try {
@@ -105,6 +109,7 @@ public class CharacterController {
 	
 	@PutMapping("/{characterId}")
 	@Transactional
+	@CacheEvict(value = "charactersList", allEntries = true)
 	public ResponseEntity<?> update(@PathVariable Long characterId, @RequestBody @Valid UpdateCharacterForm form) {
 		Character character;
 		try {
@@ -120,6 +125,7 @@ public class CharacterController {
 	
 	@PutMapping("/{characterId}/equipment")
 	@Transactional
+	@CacheEvict(value = "charactersList", allEntries = true)
 	public ResponseEntity<?> updateEquipment(@PathVariable Long characterId, @RequestBody @Valid UpdateCharacterEquipmentForm form) {
 		Character character;
 		try {
@@ -135,6 +141,7 @@ public class CharacterController {
 	
 	@DeleteMapping("/{characterId}")
 	@Transactional
+	@CacheEvict(value = "charactersList", allEntries = true)
 	public ResponseEntity<?> delete(@PathVariable Long characterId) {
 		characterRepository.deleteById(characterId);
 		

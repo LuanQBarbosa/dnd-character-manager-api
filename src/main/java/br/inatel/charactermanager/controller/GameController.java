@@ -11,7 +11,11 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -50,12 +55,14 @@ public class GameController {
 	private CharacterRepository characterRepository;
 	
 	@GetMapping
-	public ResponseEntity<?> list(Long gameMasterId) {
-		List<Game> gamesList;
+	@Cacheable(value = "gamesList")
+	public ResponseEntity<?> list(@RequestParam(required = false) Long gameMasterId, Pageable pageable) {
+		
+		Page<Game> gamesList;
 		if (gameMasterId == null) {
-			gamesList = gameRepository.findAll();			
+			gamesList = gameRepository.findAll(pageable);
 		} else {
-			gamesList = gameRepository.findByGameMasterId(gameMasterId);
+			gamesList = gameRepository.findByGameMasterId(gameMasterId, pageable);
 		}
 		
 		return ResponseEntity.ok(GameDto.convertList(gamesList));
@@ -76,6 +83,7 @@ public class GameController {
 	
 	@PostMapping
 	@Transactional
+	@CacheEvict(value = "gamesList", allEntries = true)
 	public ResponseEntity<?> create(@RequestBody @Valid GameForm form, UriComponentsBuilder uriBuilder) {
 		Game newGame = form.convert(userRepository);
 		
@@ -94,6 +102,7 @@ public class GameController {
 	
 	@PutMapping("/{gameId}")
 	@Transactional
+	@CacheEvict(value = "gamesList", allEntries = true)
 	public ResponseEntity<?> update(@PathVariable Long gameId, @RequestBody @Valid UpdateGameForm form) {
 		Game game;
 		try {
@@ -109,6 +118,7 @@ public class GameController {
 	
 	@DeleteMapping("/{gameId}")
 	@Transactional
+	@CacheEvict(value = "gamesList", allEntries = true)
 	public ResponseEntity<?> delete(@PathVariable Long gameId) {
 		gameRepository.deleteById(gameId);
 		
