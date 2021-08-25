@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -11,6 +12,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,12 +24,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import br.inatel.charactermanager.config.validation.ErrorFormDto;
 import br.inatel.charactermanager.controller.dto.GameDto;
 import br.inatel.charactermanager.controller.form.GameForm;
 import br.inatel.charactermanager.controller.form.UpdateGameForm;
 import br.inatel.charactermanager.controller.repository.CharacterRepository;
 import br.inatel.charactermanager.controller.repository.GameRepository;
 import br.inatel.charactermanager.controller.repository.UserRepository;
+import br.inatel.charactermanager.exception.InvalidPropertyException;
 import br.inatel.charactermanager.model.Character;
 import br.inatel.charactermanager.model.Game;
 import br.inatel.charactermanager.model.Job;
@@ -59,16 +63,30 @@ public class GameController {
 	
 	@GetMapping("/{gameId}")
 	public ResponseEntity<?> getByGameId(@PathVariable("gameId") Long gameId) {
-		Game game = gameRepository.findById(gameId).get();
+		Optional<Game> game = gameRepository.findById(gameId);
 		
-		return ResponseEntity.ok(new GameDto(game));
+		if(!game.isPresent()) {
+			return ResponseEntity
+				.status(HttpStatus.NOT_FOUND)
+				.body(new ErrorFormDto("", "No game found with the informed id"));
+		}
+		
+		return ResponseEntity.ok(new GameDto(game.get()));
 	}
 	
 	@PostMapping
 	@Transactional
 	public ResponseEntity<?> create(@RequestBody @Valid GameForm form, UriComponentsBuilder uriBuilder) {
-		Game newGame = form.convert(userRepository);		
-		Game game = gameRepository.save(newGame);
+		Game newGame = form.convert(userRepository);
+		
+		Game game;
+		try {
+			game = gameRepository.save(newGame);			
+		} catch(InvalidPropertyException e) {
+			return ResponseEntity
+				.status(HttpStatus.BAD_REQUEST)
+				.body(new ErrorFormDto("gameMasterId", e.getMessage()));
+		}
 		
 		URI uri = uriBuilder.path("/game/{id}").buildAndExpand(game.getId()).toUri();
 		return ResponseEntity.created(uri).body(new GameDto(game));
@@ -77,7 +95,14 @@ public class GameController {
 	@PutMapping("/{gameId}")
 	@Transactional
 	public ResponseEntity<?> update(@PathVariable Long gameId, @RequestBody @Valid UpdateGameForm form) {
-		Game game = form.update(gameId, gameRepository, userRepository, characterRepository);
+		Game game;
+		try {
+			game = form.update(gameId, gameRepository, userRepository, characterRepository);			
+		} catch(InvalidPropertyException e) {
+			return ResponseEntity
+				.status(HttpStatus.BAD_REQUEST)
+				.body(new ErrorFormDto("", e.getMessage()));
+		}
 		
 		return ResponseEntity.ok(new GameDto(game));
 	}
