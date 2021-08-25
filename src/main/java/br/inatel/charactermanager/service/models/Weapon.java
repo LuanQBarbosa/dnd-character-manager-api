@@ -12,8 +12,9 @@ public class Weapon {
 	private String weight;
 	private Cost cost;
 	private Damage damage;
+	private String apiUrl;
 	
-	public Weapon(String index, String name, String weapon_category, String weapon_range, String weight, Cost cost, Damage damage) {
+	public Weapon(String index, String name, String weapon_category, String weapon_range, String weight, Cost cost, Damage damage, String apiUrl) {
 		this.index = index;
 		this.name = name;
 		this.setWeapon_category(weapon_category);
@@ -21,6 +22,7 @@ public class Weapon {
 		this.setWeight(weight);
 		this.setCost(cost);
 		this.setDamage(damage);
+		this.apiUrl = apiUrl;
 	}
 	
 	public Weapon() {}
@@ -79,6 +81,14 @@ public class Weapon {
 
 	public void setDamage(Damage damage) {
 		this.damage = damage;
+	}
+
+	public String getApiUrl() {
+		return apiUrl;
+	}
+
+	public void setApiUrl(String apiUrl) {
+		this.apiUrl = apiUrl;
 	}
 
 }

@@ -1,12 +1,13 @@
 package br.inatel.charactermanager.service;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import br.inatel.charactermanager.service.models.Armor;
+import br.inatel.charactermanager.service.models.Equipment;
 import br.inatel.charactermanager.service.models.EquipmentCategory;
 import br.inatel.charactermanager.service.models.Item;
 import br.inatel.charactermanager.service.models.Weapon;
@@ -17,22 +18,74 @@ public class EquipmentService {
 	private RestTemplate restTemplate = new RestTemplate();
 	private String baseURL = "https://www.dnd5eapi.co/api";
 	
-	public List<EquipmentCategory> getWeaponsList() {
-		EquipmentCategory weaponsList = restTemplate.getForObject(baseURL + "/equipment-categories/weapon", EquipmentCategory.class);
+	public List<Equipment> getEquipmentList(String type) {
+		EquipmentCategory equipmentCategory = restTemplate.getForObject(baseURL + "/equipment-categories/" + type, EquipmentCategory.class);
 		
-		return Arrays.asList(weaponsList);
+		List<Equipment> equipmentsList = equipmentCategory.getEquipment().stream()
+				.filter(e -> e.getUrl().split("/")[2].equals("equipment"))
+				.collect(Collectors.toList());
+		
+		return equipmentsList;
 	}
 	
-	public List<EquipmentCategory> getArmorsList() {
-		EquipmentCategory armorsList = restTemplate.getForObject(baseURL + "/equipment-categories/armor", EquipmentCategory.class);
+	public List<Equipment> getWeaponsList() {		
+		List<Equipment> weaponsList = getEquipmentList("weapon");
 		
-		return Arrays.asList(armorsList);
+		return weaponsList;
 	}
 	
-	public List<EquipmentCategory> getItemsList() {
-		EquipmentCategory itemsList = restTemplate.getForObject(baseURL + "/equipment-categories/adventuring-gear", EquipmentCategory.class);
+	public List<Equipment> getArmorsList() {		
+		List<Equipment> armorsList = getEquipmentList("armor");
 		
-		return Arrays.asList(itemsList);
+		return armorsList;
+	}
+	
+	public List<Equipment> getItemsList() {
+		List<Equipment> itemsList = getEquipmentList("adventuring-gear");
+		
+		return itemsList;
+	}
+	
+	public List<Weapon> searchWeaponByName(String name) {
+		List<Equipment> equipmentsList = getWeaponsList();
+		
+		equipmentsList = equipmentsList.stream()
+			.filter(e -> e.getName().toLowerCase().contains(name.toLowerCase()))
+			.collect(Collectors.toList());
+		
+		List<Weapon> weaponsList = equipmentsList.stream()
+				.map(e -> getWeapon(e.getIndex()))
+				.collect(Collectors.toList());
+		
+		return weaponsList;
+	}
+	
+	public List<Armor> searchArmorByName(String name) {
+		List<Equipment> equipmentsList = getArmorsList();
+		
+		equipmentsList = equipmentsList.stream()
+			.filter(e -> e.getName().toLowerCase().contains(name.toLowerCase()))
+			.collect(Collectors.toList());
+		
+		List<Armor> armorsList = equipmentsList.stream()
+				.map(e -> getArmor(e.getIndex()))
+				.collect(Collectors.toList());
+		
+		return armorsList;
+	}
+	
+	public List<Item> searchItemByName(String name) {
+		List<Equipment> equipmentsList = getItemsList();
+		
+		equipmentsList = equipmentsList.stream()
+			.filter(e -> e.getName().toLowerCase().contains(name.toLowerCase()))
+			.collect(Collectors.toList());
+		
+		List<Item> itemsList = equipmentsList.stream()
+				.map(e -> getItem(e.getIndex()))
+				.collect(Collectors.toList());
+		
+		return itemsList;
 	}
 	
 	public Weapon getWeapon(String index) {
