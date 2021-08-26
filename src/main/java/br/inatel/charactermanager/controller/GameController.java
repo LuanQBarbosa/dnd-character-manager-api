@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -131,12 +132,12 @@ public class GameController {
 		User player1 = new User();
 		player1.setName("player1");
 		player1.setEmail("player1@email.com");
-		player1.setPassword("123456");
+		player1.setPassword(new BCryptPasswordEncoder().encode("123456"));
 		
 		User player2 = new User();
 		player2.setName("player2");
 		player2.setEmail("player2@email.com");
-		player2.setPassword("123456");
+		player2.setPassword(new BCryptPasswordEncoder().encode("123456"));
 		
 		List<User> playersList = new ArrayList<>(Arrays.asList(player1, player2));
 		
