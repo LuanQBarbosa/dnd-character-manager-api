@@ -63,7 +63,13 @@ public class GameController {
 		if (gameMasterId == null) {
 			gamesList = gameRepository.findAll(pageable);
 		} else {
-			gamesList = gameRepository.findByGameMasterId(gameMasterId, pageable);
+			gamesList = gameRepository.findAllByGameMasterId(gameMasterId, pageable);
+			
+			if (gamesList.getContent().size() == 0) {
+				return ResponseEntity
+						.status(HttpStatus.NOT_FOUND)
+						.body(new ErrorFormDto("gameMasterId", "No games found for the game master informed id"));
+			}
 		}
 		
 		return ResponseEntity.ok(GameDto.convertList(gamesList));
@@ -76,7 +82,7 @@ public class GameController {
 		if(!game.isPresent()) {
 			return ResponseEntity
 				.status(HttpStatus.NOT_FOUND)
-				.body(new ErrorFormDto("", "No game found with the informed id"));
+				.body(new ErrorFormDto("gameId", "No game found with the informed id"));
 		}
 		
 		return ResponseEntity.ok(new GameDto(game.get()));

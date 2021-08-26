@@ -8,6 +8,6 @@ import br.inatel.charactermanager.model.Game;
 
 public interface GameRepository extends JpaRepository<Game, Long> {
 
-	Page<Game> findByGameMasterId(Long gameMasterId, Pageable pageable);
+	Page<Game> findAllByGameMasterId(Long gameMasterId, Pageable pageable);
 	
 }
