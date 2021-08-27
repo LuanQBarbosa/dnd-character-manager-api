@@ -8,8 +8,10 @@ import br.inatel.charactermanager.model.Character;
 
 public interface CharacterRepository extends JpaRepository<Character, Long> {
 	
-	List<Character> findByGameId(Long gameId);
+	List<Character> findAllByGameId(Long gameId);
 	
-	List<Character> findByGameIdAndOwnerId(Long gameId, Long ownerId);
+	List<Character> findAllByOwnerId(Long ownerId);
+	
+	List<Character> findAllByGameIdAndOwnerId(Long gameId, Long ownerId);
 
 }

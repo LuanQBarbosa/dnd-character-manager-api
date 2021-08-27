@@ -128,13 +128,16 @@ public class UpdateCharacterForm {
 		this.race = race;
 	}
 	
-	public Character update(Long characterId, CharacterRepository characterRepository) throws InvalidPropertyException {
+	public Character update(Long characterId, Long authenticatedUserId, CharacterRepository characterRepository) throws InvalidPropertyException {
 		Optional<Character> optional = characterRepository.findById(characterId);
 		if (!optional.isPresent()) {
 			throw new InvalidPropertyException("Could not find a Character with specified Id");
 		}
 		
 		Character character = optional.get();
+		if (authenticatedUserId != character.getOwner().getId()) {
+			throw new InvalidPropertyException("Logged user is not this character's owner");
+		}
 		
 		character.setName(name);
 		character.setLevel(level);

@@ -39,13 +39,17 @@ public class UpdateCharacterEquipmentForm {
 		this.itemIndex = itemIndex;
 	}
 	
-	public Character update(Long characterId, CharacterRepository characterRepository, EquipmentService equipmentService) throws InvalidPropertyException {
+	public Character update(Long characterId, Long authenticatedUserId, CharacterRepository characterRepository, EquipmentService equipmentService) throws InvalidPropertyException {
 		Optional<Character> optional = characterRepository.findById(characterId);
 		if (!optional.isPresent()) {
 			throw new InvalidPropertyException("Could not find a Character with specified Id");
 		}
 		
 		Character character = optional.get();
+		if (authenticatedUserId != character.getOwner().getId()) {
+			throw new InvalidPropertyException("Logged user is not this character's owner");
+		}
+		
 		if (weaponIndex != null && weaponIndex != "") {
 			List<Equipment> weapons = equipmentService.getWeaponsList();
 			boolean contains = weapons.stream().anyMatch(x -> x.getIndex().equals(weaponIndex));

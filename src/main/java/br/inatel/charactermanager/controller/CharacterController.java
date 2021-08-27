@@ -16,6 +16,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -64,19 +66,43 @@ public class CharacterController {
 	
 	@GetMapping
 	@Cacheable(value="charactersList")
-	public ResponseEntity<?> list(Long gameId, Long playerId) {
+	public ResponseEntity<?> list(Authentication authentication, @RequestParam(required = false) Long gameId) {
+		User authenticatedUser = (User) authentication.getPrincipal();
+		Long authenticatedUserId = authenticatedUser.getId();
+		
 		List<Character> charactersList;
-		if (playerId == null) {
-			charactersList = characterRepository.findByGameId(gameId);			
+		if (gameId != null) {
+			Optional<Game> game = gameRepository.findById(gameId);
+			if (!game.isPresent()) {
+				return ResponseEntity
+						.status(HttpStatus.NOT_FOUND)
+						.body(new ErrorFormDto("", "No game found with the informed id"));
+			}
+			
+			Long gameMasterId = game.get().getGameMaster().getId();
+			if (authenticatedUserId == gameMasterId) {
+				charactersList = characterRepository.findAllByGameId(authenticatedUserId);
+			} else {
+				charactersList = characterRepository.findAllByGameIdAndOwnerId(gameId, authenticatedUserId);
+			}
 		} else {
-			charactersList = characterRepository.findByGameIdAndOwnerId(gameId, playerId);
+			charactersList = characterRepository.findAllByOwnerId(authenticatedUserId);
+		}
+		
+		if (charactersList.size() == 0) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(new ErrorFormDto("", "No characters found"));
 		}
 		
 		return ResponseEntity.ok(CharacterDto.convertList(charactersList, equipmentService));
 	}
 	
 	@GetMapping("/{characterId}")
-	public ResponseEntity<?> getByCharacterId(@PathVariable Long characterId) {
+	public ResponseEntity<?> getByCharacterId(Authentication authentication, @PathVariable Long characterId) {
+		User authenticatedUser = (User) authentication.getPrincipal();
+		Long authenticatedUserId = authenticatedUser.getId();
+		
 		Optional<Character> character = characterRepository.findById(characterId);
 		
 		if (!character.isPresent()) {
@@ -85,16 +111,26 @@ public class CharacterController {
 					.body(new ErrorFormDto("", "No character found with the informed id"));
 		}
 		
+		Long characterOwnerId = character.get().getOwner().getId();
+		if (characterOwnerId != authenticatedUserId) {
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(new ErrorFormDto("", "Logged user is not this character's owner"));
+		}
+		
 		return ResponseEntity.ok(new CharacterDto(character.get(), equipmentService));
 	}
 	
 	@PostMapping
 	@Transactional
 	@CacheEvict(value = "charactersList", allEntries = true)
-	public ResponseEntity<?> create(@RequestBody @Valid CharacterForm form, UriComponentsBuilder uriBuilder) {
+	public ResponseEntity<?> create(Authentication authentication, @RequestBody @Valid CharacterForm form, UriComponentsBuilder uriBuilder) {
+		User authenticatedUser = (User) authentication.getPrincipal();
+		Long authenticatedUserId = authenticatedUser.getId();
+		
 		Character newCharacter;
 		try {
-			newCharacter = form.convert(userRepository, gameRepository);			
+			newCharacter = form.convert(authenticatedUserId, userRepository, gameRepository);			
 		} catch(InvalidPropertyException e) {
 			return ResponseEntity
 					.status(HttpStatus.BAD_REQUEST)
@@ -110,10 +146,13 @@ public class CharacterController {
 	@PutMapping("/{characterId}")
 	@Transactional
 	@CacheEvict(value = "charactersList", allEntries = true)
-	public ResponseEntity<?> update(@PathVariable Long characterId, @RequestBody @Valid UpdateCharacterForm form) {
+	public ResponseEntity<?> update(Authentication authentication, @PathVariable Long characterId, @RequestBody @Valid UpdateCharacterForm form) {
+		User authenticatedUser = (User) authentication.getPrincipal();
+		Long authenticatedUserId = authenticatedUser.getId();
+		
 		Character character;
 		try {
-			character = form.update(characterId, characterRepository);			
+			character = form.update(characterId, authenticatedUserId, characterRepository);			
 		} catch (InvalidPropertyException e) {
 			return ResponseEntity
 					.status(HttpStatus.BAD_REQUEST)
@@ -126,10 +165,13 @@ public class CharacterController {
 	@PutMapping("/{characterId}/equipment")
 	@Transactional
 	@CacheEvict(value = "charactersList", allEntries = true)
-	public ResponseEntity<?> updateEquipment(@PathVariable Long characterId, @RequestBody @Valid UpdateCharacterEquipmentForm form) {
+	public ResponseEntity<?> updateEquipment(Authentication authentication, @PathVariable Long characterId, @RequestBody @Valid UpdateCharacterEquipmentForm form) {
+		User authenticatedUser = (User) authentication.getPrincipal();
+		Long authenticatedUserId = authenticatedUser.getId();
+		
 		Character character;
 		try {
-			character = form.update(characterId, characterRepository, equipmentService);			
+			character = form.update(characterId, authenticatedUserId, characterRepository, equipmentService);			
 		} catch (InvalidPropertyException e) {
 			return ResponseEntity
 					.status(HttpStatus.BAD_REQUEST)
@@ -142,7 +184,24 @@ public class CharacterController {
 	@DeleteMapping("/{characterId}")
 	@Transactional
 	@CacheEvict(value = "charactersList", allEntries = true)
-	public ResponseEntity<?> delete(@PathVariable Long characterId) {
+	public ResponseEntity<?> delete(Authentication authentication, @PathVariable Long characterId) {
+		User authenticatedUser = (User) authentication.getPrincipal();
+		Long authenticatedUserId = authenticatedUser.getId();
+		
+		Optional<Character> optional = characterRepository.findById(characterId);
+		if(!optional.isPresent()) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(new ErrorFormDto("characterId", "No character found with the informed id"));
+		}
+		
+		Character character = optional.get();
+		if (authenticatedUserId != character.getOwner().getId()) {
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(new ErrorFormDto("", "Logged user is not this character's owner"));
+		}
+		
 		characterRepository.deleteById(characterId);
 		
 		return ResponseEntity.ok().build();

@@ -40,8 +40,6 @@ public class CharacterForm {
 	private int charisma;
 	
 	@NotNull
-	private Long ownerId;
-	@NotNull
 	private Long gameId;
 	
 	public String getName() {
@@ -116,14 +114,6 @@ public class CharacterForm {
 		this.charisma = charisma;
 	}
 	
-	public Long getOwnerId() {
-		return ownerId;
-	}
-	
-	public void setOwnerId(Long ownerId) {
-		this.ownerId = ownerId;
-	}
-	
 	public Long getGameId() {
 		return gameId;
 	}
@@ -132,7 +122,7 @@ public class CharacterForm {
 		this.gameId = gameId;
 	}
 	
-	public Character convert(UserRepository userRepository, GameRepository gameRepository) throws InvalidPropertyException {
+	public Character convert(Long ownerId, UserRepository userRepository, GameRepository gameRepository) throws InvalidPropertyException {
 		Optional<User> owner = userRepository.findById(ownerId);
 		Optional<Game> game = gameRepository.findById(gameId);
 		
