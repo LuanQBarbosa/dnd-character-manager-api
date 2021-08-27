@@ -1,5 +1,6 @@
 package br.inatel.charactermanager.controller.form;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import javax.validation.constraints.NotEmpty;
@@ -34,6 +35,7 @@ public class GameForm {
 		Game newGame = new Game();
 		newGame.setGameMaster(gameMaster.get());
 		newGame.setName(name);
+		newGame.setPlayers(Arrays.asList(gameMaster.get()));
 		
 		return newGame;
 	}

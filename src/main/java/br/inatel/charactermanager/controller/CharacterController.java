@@ -81,7 +81,7 @@ public class CharacterController {
 			
 			Long gameMasterId = game.get().getGameMaster().getId();
 			if (authenticatedUserId == gameMasterId) {
-				charactersList = characterRepository.findAllByGameId(authenticatedUserId);
+				charactersList = characterRepository.findAllByGameId(gameId);
 			} else {
 				charactersList = characterRepository.findAllByGameIdAndOwnerId(gameId, authenticatedUserId);
 			}

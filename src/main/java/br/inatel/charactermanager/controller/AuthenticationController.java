@@ -4,6 +4,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.inatel.charactermanager.config.security.TokenService;
+import br.inatel.charactermanager.config.validation.ErrorFormDto;
 import br.inatel.charactermanager.controller.dto.TokenDto;
 import br.inatel.charactermanager.controller.form.LoginForm;
 
@@ -38,7 +40,9 @@ public class AuthenticationController {
 			
 			return ResponseEntity.ok(new TokenDto(token, "Bearer"));
 		} catch(AuthenticationException e) {
-			return ResponseEntity.badRequest().build();
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(new ErrorFormDto("", "No user with the informed data found"));
 		}
 		
 	}

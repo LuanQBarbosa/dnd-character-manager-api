@@ -85,7 +85,7 @@ public class GameControllerTest {
 		mockMvc.perform(MockMvcRequestBuilders.get("/game?gameMasterId=99").contentType(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().is(404))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.field").value("gameMasterId"))
-			.andExpect(MockMvcResultMatchers.jsonPath("$.error").value("No games found for the game master informed id"));
+			.andExpect(MockMvcResultMatchers.jsonPath("$.error").value("No games found for the informed game master id"));
 	}
 	
 	@Test
@@ -100,18 +100,6 @@ public class GameControllerTest {
 			.andExpect(MockMvcResultMatchers.status().is(404))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.field").value("gameId"))
 			.andExpect(MockMvcResultMatchers.jsonPath("$.error").value("No game found with the informed id"));
-	}
-	
-	@Test
-	public void shouldCreateNewGame() throws Exception {
-		JSONObject body = new JSONObject();
-		body.put("name", "game3");
-		body.put("gameMasterId", "1");
-		
-		mockMvc.perform(
-				MockMvcRequestBuilders.post("/game").content(body.toString()).contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().is(201))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.name").value("game3"));
 	}
 
 }
