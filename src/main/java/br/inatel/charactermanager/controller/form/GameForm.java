@@ -15,8 +15,6 @@ public class GameForm {
 	@NotNull
 	@NotEmpty
 	private String name;
-	@NotNull
-	private Long gameMasterId;
 	
 	public String getName() {
 		return name;
@@ -26,15 +24,7 @@ public class GameForm {
 		this.name = name;
 	}
 	
-	public Long getGameMasterId() {
-		return gameMasterId;
-	}
-	
-	public void setGameMasterId(Long gameMasterId) {
-		this.gameMasterId = gameMasterId;
-	}
-	
-	public Game convert(UserRepository userRepository) throws InvalidPropertyException {
+	public Game convert(Long gameMasterId, UserRepository userRepository) throws InvalidPropertyException {
 		Optional<User> gameMaster = userRepository.findById(gameMasterId);
 		
 		if (!gameMaster.isPresent()) {

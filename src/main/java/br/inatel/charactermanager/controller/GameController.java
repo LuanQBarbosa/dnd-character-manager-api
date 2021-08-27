@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -91,8 +92,9 @@ public class GameController {
 	@PostMapping
 	@Transactional
 	@CacheEvict(value = "gamesList", allEntries = true)
-	public ResponseEntity<?> create(@RequestBody @Valid GameForm form, UriComponentsBuilder uriBuilder) {
-		Game newGame = form.convert(userRepository);
+	public ResponseEntity<?> create(Authentication authentication, @RequestBody @Valid GameForm form, UriComponentsBuilder uriBuilder) {
+		User authenticatedUser = (User) authentication.getPrincipal();
+		Game newGame = form.convert(authenticatedUser.getId(), userRepository);
 		
 		Game game;
 		try {
@@ -110,10 +112,13 @@ public class GameController {
 	@PutMapping("/{gameId}")
 	@Transactional
 	@CacheEvict(value = "gamesList", allEntries = true)
-	public ResponseEntity<?> update(@PathVariable Long gameId, @RequestBody @Valid UpdateGameForm form) {
+	public ResponseEntity<?> update(Authentication authentication, @PathVariable Long gameId, @RequestBody @Valid UpdateGameForm form) {
+		User authenticatedUser = (User) authentication.getPrincipal();
+		Long authenticatedUserId = authenticatedUser.getId(); 
+		
 		Game game;
 		try {
-			game = form.update(gameId, gameRepository, userRepository, characterRepository);			
+			game = form.update(gameId, authenticatedUserId, gameRepository, userRepository, characterRepository);			
 		} catch(InvalidPropertyException e) {
 			return ResponseEntity
 				.status(HttpStatus.BAD_REQUEST)
@@ -126,7 +131,24 @@ public class GameController {
 	@DeleteMapping("/{gameId}")
 	@Transactional
 	@CacheEvict(value = "gamesList", allEntries = true)
-	public ResponseEntity<?> delete(@PathVariable Long gameId) {
+	public ResponseEntity<?> delete(Authentication authentication, @PathVariable Long gameId) {
+		User authenticatedUser = (User) authentication.getPrincipal();
+		Long authenticatedUserId = authenticatedUser.getId();
+		
+		Optional<Game> optional = gameRepository.findById(gameId);
+		if(!optional.isPresent()) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body(new ErrorFormDto("gameId", "No game found with the informed id"));
+		}
+		
+		Game game = optional.get();
+		if (authenticatedUserId != game.getGameMaster().getId()) {
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body(new ErrorFormDto("", "Logged user is not this game's game master"));
+		}
+		
 		gameRepository.deleteById(gameId);
 		
 		return ResponseEntity.ok().build();

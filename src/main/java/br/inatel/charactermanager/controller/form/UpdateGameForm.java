@@ -50,7 +50,7 @@ public class UpdateGameForm {
 		this.newCharacterId = newCharacterId;
 	}
 
-	public Game update(Long gameId, GameRepository gameRepository, UserRepository userRepository, CharacterRepository characterRepository) throws InvalidPropertyException {
+	public Game update(Long gameId, Long authenticatedUserId, GameRepository gameRepository, UserRepository userRepository, CharacterRepository characterRepository) throws InvalidPropertyException {
 		Optional<Game> optional = gameRepository.findById(gameId);
 		
 		if(!optional.isPresent()) {
@@ -58,6 +58,11 @@ public class UpdateGameForm {
 		}
 		
 		Game game = optional.get();
+		if (authenticatedUserId != game.getGameMaster().getId()) {
+			throw new InvalidPropertyException("Logged user is not this game's game master");
+		}
+		
+		
 		if (name != null && name != "") {
 			game.setName(name);
 		}
